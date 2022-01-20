@@ -35,6 +35,8 @@ INSERT INTO `Entry_tag` VALUES (null, 1, 1);
 
 INSERT INTO entries VALUES (null, 'sql', 'We started sql', '1/18/22', 2);
 
+INSERT INTO `moods` VALUES (null, 'exhausted');
+
 
 
 

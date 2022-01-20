@@ -1,6 +1,6 @@
 import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from views import get_all_entries, get_single_entry, delete_entry, search_entries
+from views import get_all_entries, get_single_entry, delete_entry, search_entries, create_entry
 
 
 
@@ -103,8 +103,8 @@ class HandleRequests(BaseHTTPRequestHandler):
         # Add a new animal to the list. Don't worry about
         # the orange squiggle, you'll define the create_animal
         # function next.
-        # if resource == "animals":
-        #     new_resource = create_animal(post_body)   
+        if resource == "entries":
+            new_resource = create_entry(post_body)   
         # elif resource == "locations":
         #     new_resource = create_location(post_body)
         # elif resource == "employees":
