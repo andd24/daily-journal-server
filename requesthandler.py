@@ -1,6 +1,6 @@
 import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from views import get_all_entries, get_single_entry, delete_entry
+from views import get_all_entries, get_single_entry, delete_entry, search_entries
 
 
 
@@ -70,11 +70,11 @@ class HandleRequests(BaseHTTPRequestHandler):
             #         response = f"{get_single_customer(id)}"
             #     else:
             #         response = f"{get_all_customers()}"
-        # elif len(parsed) == 3:
-        #     ( resource, key, value ) = parsed
+        elif len(parsed) == 3:
+            ( resource, key, value ) = parsed
             
-        #     if key == "email" and resource == "customers":
-        #         response = get_customers_by_email(value)
+            if resource == "entries" and key == "q":
+                response = search_entries(value)
         #     elif key == "location_id" and resource == "animals":
         #         response = get_animals_by_location(value)
         #     elif key == "location_id" and resource == "employees":
