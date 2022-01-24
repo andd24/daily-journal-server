@@ -1,6 +1,6 @@
 import sqlite3
 import json
-from models import Entry, Mood
+from models import Entry, Mood, Tag
 
 def get_all_entries():
     with sqlite3.connect("./dailyjournal.sqlite3") as conn:
@@ -21,7 +21,7 @@ def get_all_entries():
         JOIN moods m
         ON m.id = e.mood_id
         """)
-
+        
         entries = []
 
         dataset = db_cursor.fetchall()
@@ -36,8 +36,24 @@ def get_all_entries():
             mood = Mood(row['mood_id'], row['label'])
             
             entry.mood = mood.__dict__
-
             entries.append(entry.__dict__)
+            
+            db_cursor.execute("""
+               select t.id, t.tag
+               from entry_tags en
+               join tags t on t.id = en.tag_id
+               where en.entry_id = ?
+            """, (entry.id, ))
+            
+            tags = []
+            
+            tag_dataset = db_cursor.fetchall()
+            
+            for tag_row in tag_dataset:
+                tag = Tag(tag_row['id'], tag_row['tag'])
+                tags.append(tag.__dict__)
+                
+            entry.tags = tags
 
     # Use `json` package to properly serialize list as JSON
     return json.dumps(entries)
@@ -122,17 +138,45 @@ def create_entry(new_entry):
         VALUES
             ( ?, ?, ?, ? );
         """, (new_entry['concept'], new_entry['entry'],
-              new_entry['date'], new_entry['mood_id'], ))
+              new_entry['date'], new_entry['mood_id'] ))
 
-        # The `lastrowid` property on the cursor will return
-        # the primary key of the last thing that got added to
-        # the database.
         id = db_cursor.lastrowid
-
-        # Add the `id` property to the entry dictionary that
-        # was sent by the client so that the client sees the
-        # primary key in the response.
         new_entry['id'] = id
+        
+        
+        for tag in new_entry['tags']:
+            db_cursor.execute("""
+            INSERT INTO entry_tags
+                ( tag_id, entry_id )
+            VALUES 
+                ( ?, ? );
+            """, (tag, new_entry['id']))
 
 
     return json.dumps(new_entry)
+
+def update_entry(id, new_entry):
+    with sqlite3.connect("./dailyjournal.sqlite3") as conn:
+        db_cursor = conn.cursor()
+
+        db_cursor.execute("""
+        UPDATE entries
+            SET
+                concept = ?,
+                entry = ?,
+                date = ?,
+                mood_id = ?
+        WHERE id = ?
+        """, (new_entry['concept'], new_entry['entry'],
+              new_entry['date'], new_entry['mood_id'], id, ))
+
+        # Were any rows affected?
+        # Did the client send an `id` that exists?
+        rows_affected = db_cursor.rowcount
+
+    if rows_affected == 0:
+        # Forces 404 response by main module
+        return False
+    else:
+        # Forces 204 response by main module
+        return True

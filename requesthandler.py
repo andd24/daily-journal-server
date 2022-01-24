@@ -1,6 +1,6 @@
 import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from views import get_all_entries, get_single_entry, delete_entry, search_entries, create_entry
+from views import get_all_entries, get_single_entry, delete_entry, search_entries, create_entry, update_entry, get_single_tag, get_all_tags
 
 
 
@@ -55,11 +55,11 @@ class HandleRequests(BaseHTTPRequestHandler):
                     response = f"{get_single_entry(id)}"
                 else:
                     response = f"{get_all_entries()}"                   
-            # elif resource == "locations":
-            #     if id is not None:
-            #         response = f"{get_single_location(id)}"
-            #     else:
-            #         response = f"{get_all_locations()}"
+            elif resource == "tags":
+                if id is not None:
+                    response = f"{get_single_tag(id)}"
+                else:
+                    response = f"{get_all_tags()}"
             # elif resource == "employees":
             #     if id is not None:
             #         response = f"{get_single_employee(id)}"
@@ -128,8 +128,8 @@ class HandleRequests(BaseHTTPRequestHandler):
         success = False
         
         # Delete a single animal from the list
-        # if resource == "entries":
-        #     success = update_animal(id, post_body)
+        if resource == "entries":
+            success = update_entry(id, post_body)
         # elif resource == "locations":
         #     success = update_location(id, post_body)
         # elif resource == "employees":

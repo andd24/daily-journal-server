@@ -37,7 +37,7 @@ INSERT INTO entries VALUES (null, 'sql', 'We started sql', '1/18/22', 2);
 
 INSERT INTO `moods` VALUES (null, 'exhausted');
 
-
-
+INSERT INTO `tags` VALUES (null, "sql");
+INSERT INTO `tags` VALUES (null, "react");
 
 
